@@ -160,10 +160,17 @@ def fetch_2345_weather(city_name, area_id, year, month):
         })
     return weather_list, weather_list_raw
 
-def fetch_multi_month_weather():
-    # 交互式输入城市名
-    city_name = input("请输入城市名称（如：北京、南京、上海）: ").strip()
-    if not city_name:
+def fetch_multi_month_weather(city_name, year, month, month_count):
+    """
+    获取多个月份的天气数据并保存为csv文件
+
+    参数:
+        city_name (str): 城市名称，如“北京”
+        year (int): 年份，如2025
+        month (int): 月份，1-12
+        month_count (int): 需要获取的月数（如3，表示当前月及前2个月）
+    """
+    if not city_name or not isinstance(city_name, str):
         print("城市名不能为空")
         exit(1)
     city_info = search_city_id(city_name)
@@ -172,14 +179,14 @@ def fetch_multi_month_weather():
         exit(1)
     area_id, area_name = city_info
 
-    # 输入年份、月份和需要获取的月数
+    # 检查年份、月份和月数
     try:
-        year = int(input("请输入年份（如2025）: ").strip())
-        month = int(input("请输入月份（1-12）: ").strip())
+        year = int(year)
+        month = int(month)
+        month_count = int(month_count)
         if not (1 <= month <= 12):
             print("月份必须在1-12之间")
             exit(1)
-        month_count = int(input("请输入需要获取的月数（如3，表示当前月及前2个月）: ").strip())
         if month_count < 1:
             print("月数必须大于等于1")
             exit(1)
@@ -231,6 +238,3 @@ def fetch_multi_month_weather():
         print(f"已保存为 {area_name}_2345历史天气_raw_{ym_range}.csv")
     else:
         print("未获取到任何原始数据")
-
-if __name__ == "__main__":
-    fetch_multi_month_weather()

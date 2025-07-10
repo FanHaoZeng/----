@@ -1,2 +1,5 @@
 # 忽略 data 文件夹及其所有内容
 /data/ 
+
+# 忽略 an.ipynb
+an.ipynb

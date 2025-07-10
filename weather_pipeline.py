@@ -23,11 +23,16 @@ def main():
     param_list = []
 
     if not os.path.exists(param_file):
-        print(f"未找到参数文件: {param_file}，请先创建该文件，格式如：南京,2025,7,3")
+        print(f"未找到参数文件: {param_file}，请先创建该文件，格式如：city_name,year,month,month_count")
         exit(1)
 
     with open(param_file, "r", encoding="utf-8-sig") as f:
-        for line in f:
+        lines = f.readlines()
+        if not lines:
+            print(f"参数文件 {param_file} 为空，请检查内容")
+            exit(1)
+        
+        for line in lines:
             line = line.strip()
             if not line or line.startswith("#"):
                 continue

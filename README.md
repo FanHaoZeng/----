@@ -1,17 +1,19 @@
-# 天气数据导入MySQL工具
+# 天气数据自动获取与导入MySQL工具
 
-这个工具用于将CSV格式的天气数据导入到MySQL数据库中。
+本项目实现了从2345天气网自动获取历史天气数据，并一键导入MySQL数据库的完整流程，支持单城市和批量城市处理。
 
-## 文件说明
+## 主要文件说明
 
-- `import_weather_to_mysql.py`: 主要的导入脚本（逐行插入）
-- `import_weather_to_mysql_batch.py`: 高效的批量导入脚本（推荐使用）
-- `test_import.py`: 测试脚本，用于验证数据导入结果
-- `config.py`: 数据库连接配置文件
-- `*.csv`: 天气数据文件
+- `weather_2345.py`：天气数据爬取与处理脚本
+- `import_weather_to_mysql.py`：CSV数据导入MySQL（逐行插入）
+- `import_weather_to_mysql_batch.py`：CSV数据批量导入MySQL（推荐，速度更快）
+- `weather_pipeline.py`：一键全流程脚本（推荐使用）
+- `config.py`：数据库连接配置
+- `city.csv`：批量城市及参数配置文件
+- `test_import.py`：测试脚本，验证数据导入结果
+- `data/`：存放原始和处理后的CSV数据文件
 
-## 使用步骤
-
+## 快速开始
 
 ### 1. 配置数据库连接
 
@@ -20,27 +22,42 @@
 ```python
 DB_CONFIG = {
     'host': 'localhost',      # MySQL服务器地址
-    'user': 'root',          # 数据库用户名
+    'user': 'root',           # 数据库用户名
     'password': 'your_password', # 数据库密码
-    'database': 'weather_db' # 数据库名称
+    'database': 'weather_db'  # 数据库名称
 }
 ```
 
-### 2. 运行导入脚本
+### 2. 一键全流程操作
 
-推荐使用批量导入版本（更快）：
+推荐使用 `weather_pipeline.py`，自动完成数据获取、保存、导入和文件归档：
 
 ```bash
-python import_weather_to_mysql_batch.py
+python weather_pipeline.py
 ```
 
-或者使用标准版本：
+准备 `city.csv` 文件，格式如下：
+
+```csv
+北京,2024,5,3
+上海,2024,5,3
+广州,2024,5,3
+```
+
+每行一个城市，year为年份，month为起始月份，month_count为连续月数。
+获取从当前Year.Month开始，历史month_count个月的数据，（包含起始月份）
+
+### 4. 仅导入现有CSV文件
+
+如只需将已有CSV导入数据库，可直接运行：
 
 ```bash
 python import_weather_to_mysql.py
+# 或
+python import_weather_to_mysql_batch.py
 ```
 
-### 3. 验证数据导入
+### 5. 验证数据导入
 
 运行测试脚本验证数据是否正确导入：
 
@@ -50,7 +67,7 @@ python test_import.py
 
 ## 数据表结构
 
-脚本会自动创建以下表结构：
+脚本会自动创建如下表结构：
 
 ```sql
 CREATE TABLE `dwd_xlyc_opl_weather_de` (
@@ -64,3 +81,7 @@ CREATE TABLE `dwd_xlyc_opl_weather_de` (
   `date` datetime DEFAULT NULL
 )
 ```
+
+## 注意事项
+- 已导入的CSV文件会自动移动到 `data/imported/` 文件夹，避免重复导入。
+- 如需自定义批量城市参数，请编辑 `city.csv` 文件。
